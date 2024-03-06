@@ -20,7 +20,6 @@ const navbarElem = document.querySelector('#navbarElem');
 
 let isHome = true;
 
-
 addTask.addEventListener('click', () => {
     dialog.showModal();
 })
@@ -31,12 +30,12 @@ close.addEventListener('click', () => {
 
 let myTask = JSON.parse(localStorage.getItem('myTask')) || [];
 
-
 localStorage.setItem('myTask', JSON.stringify(myTask))
 
 form.addEventListener('submit', (e) => {
     e.preventDefault()
 
+    let i = myTask.length;
     const formData = new FormData(form);
     const values = Object.fromEntries(formData.entries());
 
@@ -57,11 +56,7 @@ function addTaskFn (obj) {
         arr.push(obj[key]);
     }
 
-    let i = 0;
-
-    for (i; i < myTask.length; i++) {
-        i = i;
-    }
+    let i = myTask.length;
     
     myTask.push(new createTask(...arr, i));
 }
@@ -80,8 +75,9 @@ function addTaskDom (obj) {
 
 function addProject (value, projectValue) {
     checkAndAddProject(projectValue);
-    let project = JSON.parse(localStorage.getItem(projectValue)) || []; 
-    project.push(value); 
+    let project = JSON.parse(localStorage.getItem(projectValue)) || [];
+    let taskId = myTask.length -1; 
+    project.push({...value, id: taskId}); 
     localStorage.setItem(projectValue, JSON.stringify(project));
 }
 
@@ -103,7 +99,7 @@ navbarElem.addEventListener('click', (event) => {
         isHome = false;
         const val = JSON.parse(localStorage.getItem(target.textContent))
         addTaskDom(val);
-        updateLocalStorage ()
+        updateLocalStorage();
     }
 })
 
@@ -112,49 +108,6 @@ dom.home.addEventListener('click', () => {
     addTaskDom(myTask);
     updateLocalStorage();
 }) 
-//==================================================================================
-content.addEventListener('click', (event) => {
-    const target = event.target;
-    let div = target.closest('.task');
-
-    if (div && !target.closest('.button_task')) {
-        let taskId = div.id;
-        const taskData = JSON.parse(localStorage.getItem('myTask'));
-        let obj = taskData[taskId];
-
-        let formChange = new FormData(form);
-        for (let key in obj) {
-            if (key !== 'id') {
-                formChange.set(key, obj[key]);
-            }
-        }
-
-        for (let pair of formChange.entries()) {
-            const [key, value] = pair;
-            document.getElementById(key).value = value;
-        }
-
-        // console.log(myTask[taskId]);
-
-        dialog.showModal();
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-        
-            for (const pair of formChange.entries()) {
-                const [key, value] = pair;
-                myTask[taskId][key] = value;
-            }
-        
-            localStorage.setItem('myTask', JSON.stringify(myTask)); // Обновляем данные в localStorage
-        
-            updateLocalStorage();
-            dialog.close();
-        });
-    }
-})
-
-
 
 window.addEventListener('load', () => {
     myTask = JSON.parse(localStorage.getItem('myTask'));
