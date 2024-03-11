@@ -1,13 +1,15 @@
-import dom from './dom.js';
+// import dom from './dom.js';
+import createTask from './createTask';
+import { idGenerate } from './idGenereate';
 
-function addTaskFn (obj) {
+export default function addTaskFn (list, obj) {
     const arr = [];
     
     for (let key in obj) {
         arr.push(obj[key]);
     }
 
-    let i = myTask.length;
+    let i = idGenerate();
     
-    myTask.push(new createTask(...arr, i));
+    list.push(new createTask(...arr, i));
 }

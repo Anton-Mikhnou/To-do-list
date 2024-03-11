@@ -1,8 +1,11 @@
 import './style.css';
 import dom from './components/dom';
-import createTask from './components/createTask';
+// import createTask from './components/createTask';
 import taskDom from './components/TaskDom';
 import projectDom from './components/projectDom';
+import addTaskFn from './components/addTask';
+import deleteTask from './components/deleteTask';
+import { idGenerate } from './components/idGenereate';
 
 function removeAllChildNodes (parent) {
     while (parent.firstChild) {
@@ -16,8 +19,11 @@ const dialog = document.querySelector('dialog');
 const close = document.querySelector('.close');
 const form = document.getElementById('form');
 const navbarElem = document.querySelector('#navbarElem');
-// const task = document.querySelectorAll('.task'); 
+// const remove = document.querySelectorAll('.remove');
+const butonTask = document.querySelectorAll('.button_task');
+const task = document.querySelectorAll('.task')
 
+let isChange = false;
 let isHome = true;
 
 addTask.addEventListener('click', () => {
@@ -34,41 +40,30 @@ localStorage.setItem('myTask', JSON.stringify(myTask))
 
 form.addEventListener('submit', (e) => {
     e.preventDefault()
-
-    let i = myTask.length;
     const formData = new FormData(form);
     const values = Object.fromEntries(formData.entries());
-
-    addTaskFn(values);
-    if(isHome === true) {
-        addTaskDom(myTask);
+   
+    if (isChange === false) {
+        addTaskFn(myTask, values);
+        if(isHome === true) {
+            addTaskDom(myTask);
+        }
+        addProject(values, values.project);
     }
-    addProject(values, values.project);
     updateLocalStorage();
 
     dialog.close();
 })
-
-function addTaskFn (obj) {
-    const arr = [];
-    
-    for (let key in obj) {
-        arr.push(obj[key]);
-    }
-
-    let i = myTask.length;
-    
-    myTask.push(new createTask(...arr, i));
-}
 
 function addTaskDom (obj) {
 
     removeAllChildNodes(dom.content);
     for (let i = 0; i < obj.length; i++) {
         let arrValue = Object.values(obj[i]);
-        // dom.content.appendChild(taskDom(...arrValue))
         let taskElement = taskDom(...arrValue);
-        taskElement.id = i;
+        // taskElement.id = i;
+        taskElement.id = idGenerate();
+        // taskElement.dataset.taskId = obj[i].id;
         dom.content.appendChild(taskElement);
     }
 }
@@ -76,18 +71,104 @@ function addTaskDom (obj) {
 function addProject (value, projectValue) {
     checkAndAddProject(projectValue);
     let project = JSON.parse(localStorage.getItem(projectValue)) || [];
-    let taskId = myTask.length -1; 
+    // let taskId = myTask.length -1; 
+    let taskId = idGenerate();
     project.push({...value, id: taskId}); 
     localStorage.setItem(projectValue, JSON.stringify(project));
 }
 
+
+
 function checkAndAddProject (projectName) {
-    if( localStorage.getItem(projectName)) {
+    if (localStorage.getItem(projectName)) {
         return;
     } else {
         projectDom(projectName);
     }
 }   
+//====================================================-=-=-=-=--=====================================================
+content.addEventListener('click', (event) => {
+    const target = event.target
+    let taskElement = target.closest('.task');
+    const taskBtn = target.closest('.button_task'); 
+    if (taskElement && !taskBtn) {
+        console.log('task');
+    } else if (taskBtn) {
+        let i = +taskElement.id;
+        let projectName;
+        for (let j = 0; j < myTask.length; j++) {
+            if(myTask[j].id === i) {
+                projectName = myTask[j].project;
+            }
+        }
+        console.log(projectName);
+        deleteTask(myTask, i);
+        updateLocalStorage();
+        addTaskDom(myTask);
+        
+    }
+
+    // if (taskElement && !taskBtn) {
+    //     console.log('task');
+    // } else if (taskBtn) {
+    //     let taskId = +taskElement.id; // Получаем ID задачи
+    //     // Находим проект, к которому принадлежит задача
+    //     let projectName = myTask[taskId].project;
+    //     // Удаляем задачу из массива myTask
+    //     myTask = myTask.filter((task, index) => index !== taskId);
+    //     // Обновляем локальное хранилище для myTask
+    //     updateLocalStorage();
+    //     // Удаляем задачу из соответствующего проекта
+    //     if (projectName) {
+    //         let projectTasks = JSON.parse(localStorage.getItem(projectName)) || [];
+    //         projectTasks = projectTasks.filter(task => task.id !== taskId);
+    //         localStorage.setItem(projectName, JSON.stringify(projectTasks));
+    //     }
+    //     // Обновляем DOM
+    //     addTaskDom(myTask);
+    // }
+   
+})
+
+// content.addEventListener('click', (event) => {
+//     const target = event.target;
+//     let taskElement = target.closest('.task');
+//     const taskBtn = target.closest('.button_task');
+//     if (taskElement && !taskBtn) {
+//         console.log('task');
+//     } else if (taskBtn) {
+//         let taskId = +taskElement.id; // Получаем ID задачи
+//         // Сначала находим проект, к которому принадлежит задача, до её удаления
+//         let projectName;
+//         for (let task of myTask) {
+//             if (task.id === taskId) {
+//                 projectName = task.project;
+//                 break;
+//             }
+//         }
+
+//         // Удаляем задачу из массива myTask
+//         myTask = myTask.filter((task, index) => index !== taskId);
+//         // Обновляем локальное хранилище для myTask
+//         updateLocalStorage();
+
+//         // Удаляем задачу из соответствующего проекта
+//         if (projectName) {
+//             let projectTasks = JSON.parse(localStorage.getItem(projectName)) || [];
+//             projectTasks = projectTasks.filter(task => task.id !== taskId);
+//             if (projectTasks.length > 0) {
+//                 // Сохраняем обновленный массив задач проекта, если он не пуст
+//                 localStorage.setItem(projectName, JSON.stringify(projectTasks));
+//             } else {
+//                 // Если это была последняя задача в проекте, удаляем ключ проекта из локального хранилища
+//                 console.log(`Удаляем проект: ${projectName}`);
+//                 localStorage.removeItem(projectName);
+//             }
+//         }
+//         // Обновляем DOM
+//         addTaskDom(myTask);
+//     }
+// });
 
 function updateLocalStorage () {
     localStorage.setItem('myTask', JSON.stringify(myTask));
