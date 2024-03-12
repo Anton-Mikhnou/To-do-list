@@ -1,8 +1,5 @@
 import '../../src/';
 import dom from './dom';
-// import done from '../svg/done.svg'
-// import { Parser } from 'webpack';
-// import doneSvg from '../svg/done';
 
 export default function taskDom(title, priority, deadline, project, descriptionForm) {
     const task = document.createElement('div');
