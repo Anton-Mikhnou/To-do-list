@@ -5,11 +5,18 @@ import taskDom from './components/TaskDom';
 import projectDom from './components/projectDom';
 import addTaskFn from './components/addTask';
 import deleteTask from './components/deleteTask';
-import { idGenerate } from './components/idGenereate';
+// let exceptionElem = '<div class="itemNav"><svg  width="20" height="20" fill="#FFDDD2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>clipboard-edit-outline</title><path d="M21.04 12.13C21.18 12.13 21.31 12.19 21.42 12.3L22.7 13.58C22.92 13.79 22.92 14.14 22.7 14.35L21.7 15.35L19.65 13.3L20.65 12.3C20.76 12.19 20.9 12.13 21.04 12.13M19.07 13.88L21.12 15.93L15.06 22H13V19.94L19.07 13.88M11 19L9 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3H9.18C9.6 1.84 10.7 1 12 1C13.3 1 14.4 1.84 14.82 3H19C20.1 3 21 3.9 21 5V9L19 11V5H17V7H7V5H5V19H11M12 3C11.45 3 11 3.45 11 4C11 4.55 11.45 5 12 5C12.55 5 13 4.55 13 4C13 3.45 12.55 3 12 3Z" /></svg><span>Project</span></div>'
 
 function removeAllChildNodes (parent) {
     while (parent.firstChild) {
         parent.removeChild(parent.firstChild);
+    }
+}
+
+function removeAllLastdNodes (parent) {
+    console.log(parent.childNodes.length);
+    while (parent.childNodes.length > 2) {
+        parent.removeChild(parent.lastChild);
     }
 }
 
@@ -18,6 +25,7 @@ const addTask = document.querySelector('.addTask');
 const dialog = document.querySelector('dialog');
 const close = document.querySelector('.close');
 const form = document.getElementById('form');
+// const itemNav = document.querySelector('')
 const navbarElem = document.querySelector('#navbarElem');
 const butonTask = document.querySelectorAll('.button_task');
 const task = document.querySelectorAll('.task');
@@ -45,7 +53,7 @@ form.addEventListener('submit', (e) => {
         if(isHome) {
             addTaskFn(myTask, values);
             addTaskDom(myTask);
-            addProjectFn(myTask, values);
+            addProjectFn(myTask);
             localStorage.setItem('myTask', JSON.stringify(myTask))
         }
     }
@@ -63,28 +71,10 @@ function addTaskDom(arr) {
     } 
 }
 
-// function addProjectFn (arr, value) {
-//     let projectName = value.project;
-//     let project = JSON.parse(localStorage.getItem(projectName)) || [];
-    
-//     let projectObj = arr.find((elem) => {
-//         for (let key in elem) {
-//             if(elem[key] === projectName) {
-//                 localStorage.setItem(projectName, )
-//                 project.push(elem);
-//                 // return elem;
-//             }
-//         }
-//     })
-//     localStorage.setItem(projectName, JSON.stringify(project))
-//     // console.log(projectObj);
-//     // project.push(projectObj);
-//     // console.log(projectName);
-// }
-
 function addProjectFn(arr) {
     let projects = {};
-
+    console.log(projects);
+    
     Object.keys(localStorage).forEach(key => {
         if (key !== 'myTask') { 
             localStorage.removeItem(key);
@@ -99,7 +89,21 @@ function addProjectFn(arr) {
         projects[projectName].push(task);
     });
 
+    
     for (let projectName in projects) {
         localStorage.setItem(projectName, JSON.stringify(projects[projectName]));
     }
+    addProjectDom(projects);
+    
 }
+
+function addProjectDom(obj) {
+    let arrKey = Object.keys(obj);
+    removeAllLastdNodes(navbarElem);
+    arrKey.forEach((elem) => {
+        projectDom(elem);
+    })
+}
+
+
+
