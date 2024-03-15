@@ -25,7 +25,7 @@ const dialog = document.querySelector('dialog');
 const close = document.querySelector('.close');
 const form = document.getElementById('form');
 const navbarElem = document.querySelector('#navbarElem');
-const butonTask = document.querySelectorAll('.button_task');
+// const butonTask = document.querySelectorAll('.button_task');
 const task = document.querySelectorAll('.task');
 
 let isProject;
@@ -33,6 +33,7 @@ let isChange = false;
 let isHome = true;
 
 addTask.addEventListener('click', () => {
+    isChange = false;
     dialog.showModal();
 })
 
@@ -48,13 +49,20 @@ form.addEventListener('submit', (e) => {
     e.preventDefault()
     const formData = new FormData(form);
     const values = Object.fromEntries(formData.entries());
-    if (isChange === false) {
-        addTaskFn(myTask, values);
-        addProjectFn(myTask);
-        if(isHome) {
-            addTaskDom(myTask);
-        }
-        localStorage.setItem('myTask', JSON.stringify(myTask))
+    console.log(values);
+    if(isChange) {
+        changeTask(myTask, elemId, values);
+        console.log('Work');
+        // localStorage.setItem('myTask', JSON.stringify(myTask))
+    } else{
+        // if (!isChange) {
+            addTaskFn(myTask, values);
+            addProjectFn(myTask);
+            if(isHome) {
+                addTaskDom(myTask);
+            }
+            localStorage.setItem('myTask', JSON.stringify(myTask))
+        // }
     }
 
     dialog.close();
@@ -104,42 +112,46 @@ function addProjectDom(obj) {
 
 navbarElem.addEventListener('click', (event)=>{
     const target = event.target; 
+    isChange = false;
     if(target.classList.contains('itemProject')){
-        // isProject = target.textContent;
         isHome = false;
         const val = JSON.parse(localStorage.getItem(target.textContent))
         addTaskDom(val);
         localStorage.setItem('myTask', JSON.stringify(myTask));
     }
+    console.log('isCh', isChange);
 })
 
 dom.home.addEventListener('click', () => {
+    isChange = false;
     isHome = true;
     addTaskDom(myTask);
     localStorage.setItem('myTask', JSON.stringify(myTask));
+    console.log('isCh', isChange);
 })
+
+let elemId;
 
 content.addEventListener('click', (event) => {
     const target = event.target;
     const task = target.closest('.task')
     const deleteBtn = target.closest('.button_task');
+
+    let elemId;
     if(deleteBtn) {
-        // console.log('%c Work', 'color: oragne;');
-        // console.log(task.id);
-        let elemId;
-        let arr = myTask.some((element, index) => {
+        myTask.some((element, index) => {
             for(let id in element) {
                 if(element[id] === task.id) {
                     elemId = index;
                     isProject = element.project;
-                    console.log(element[id]);
-                    console.log(element.project);
+                    // console.log(element[id]);
+                    // console.log(element.project);
                 }
             }
         }) 
-        const argProject = myTask.filter(task => task.project === isProject);
-        console.log(isProject);
-        // console.log(elemId);
+
+        // const argProject = myTask.filter(task => task.project === isProject);
+
         deleteTask(myTask, elemId)
         addProjectFn(myTask);
         if(isHome) {
@@ -147,12 +159,54 @@ content.addEventListener('click', (event) => {
         } else if (isHome === false) {
             addTaskDom(JSON.parse(localStorage.getItem(isProject)))
         }
-        // addTaskDom(argProject);
+
         localStorage.setItem('myTask', JSON.stringify(myTask));
+    } else if (task) {
+        isChange = true;
+        console.log('isCh', isChange);
+        // let elemId;
+        let elemObj = {};
+        myTask.some((element, index) => {
+            for(let id in element) {
+                if(element[id] === task.id) {
+                    elemId = index;
+                    isProject = element.project;
+                    elemObj = element;
+                }
+            }
+        })
+
+        const valueFormBefore = new FormData(form);
+
+        for(let key in elemObj) {
+            if(key !== 'id') {
+                console.log(key, elemObj[key]);
+                valueFormBefore.set(key, elemObj[key]);
+            }
+        }
+
+        for(const pair of valueFormBefore.entries()) {
+            const [key, value] = pair;
+            document.getElementById(key).value = value;
+        }
+
+        dialog.showModal()
+        console.log(task.id);
+        console.log(elemObj);
+        
     }
 })
 
 
+function changeTask(arr, taskId, newObj) {
+    const taskIndex = arr.filter(task => task.id === taskId);
+
+    // arr[taskIndex] = {...myTask[taskIndex], ...newObj}
+    arr.splice(taskId, 1, newObj)
+    console.log(myTask);
+    addTaskDom(arr);
+    // localStorage.setItem(arr, JSON.stringify(arr));
+}
 
 
 window.addEventListener('load', () => {
