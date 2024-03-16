@@ -1,7 +1,6 @@
 const domElement = {
     content: document.querySelector('.content'),
     task: document.querySelector('.task'),
-    //button
     addTask: document.querySelector('.addTask'),
     today: document.querySelector('#today'),
     completed: document.querySelector('#completed'),

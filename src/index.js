@@ -1,6 +1,5 @@
 import './style.css';
 import dom from './components/dom';
-// import createTask from './components/createTask';
 import taskDom from './components/TaskDom';
 import projectDom from './components/projectDom';
 import addTaskFn from './components/addTask';
@@ -25,8 +24,6 @@ const dialog = document.querySelector('dialog');
 const close = document.querySelector('.close');
 const form = document.getElementById('form');
 const navbarElem = document.querySelector('#navbarElem');
-// const butonTask = document.querySelectorAll('.button_task');
-const task = document.querySelectorAll('.task');
 
 let isProject;
 let isChange = false;
