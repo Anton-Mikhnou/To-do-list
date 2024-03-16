@@ -49,24 +49,24 @@ form.addEventListener('submit', (e) => {
     e.preventDefault()
     const formData = new FormData(form);
     const values = Object.fromEntries(formData.entries());
-    console.log(values);
     if(isChange) {
         changeTask(myTask, elemId, values);
         addProjectFn(myTask);
-
-        console.log('Work');
-        // localStorage.setItem('myTask', JSON.stringify(myTask))
-    } else{
-        // if (!isChange) {
-            addTaskFn(myTask, values);
-            addProjectFn(myTask);
-            if(isHome) {
-                addTaskDom(myTask);
-            }
-            // }
+        const projectPage = JSON.parse(localStorage.getItem(myTask[elemId].project));
+        if(isHome === true) {
+            addTaskDom(myTask);
+            console.log('work');
+        } else {
+            addTaskDom(projectPage)
         }
-        localStorage.setItem('myTask', JSON.stringify(myTask))
-
+    } else{
+        addTaskFn(myTask, values);
+        addProjectFn(myTask);
+        if(isHome) {
+            addTaskDom(myTask);
+        }
+    }
+    localStorage.setItem('myTask', JSON.stringify(myTask))
     dialog.close();
 })
 
@@ -121,7 +121,6 @@ navbarElem.addEventListener('click', (event)=>{
         addTaskDom(val);
         localStorage.setItem('myTask', JSON.stringify(myTask));
     }
-    console.log('isCh', isChange);
 })
 
 dom.home.addEventListener('click', () => {
@@ -129,7 +128,6 @@ dom.home.addEventListener('click', () => {
     isHome = true;
     addTaskDom(myTask);
     localStorage.setItem('myTask', JSON.stringify(myTask));
-    console.log('isCh', isChange);
 })
 
 let elemId;
@@ -139,15 +137,12 @@ content.addEventListener('click', (event) => {
     const task = target.closest('.task')
     const deleteBtn = target.closest('.button_task');
 
-    // let elemId;
     if(deleteBtn) {
         myTask.some((element, index) => {
             for(let id in element) {
                 if(element[id] === task.id) {
                     elemId = index;
                     isProject = element.project;
-                    // console.log(element[id]);
-                    // console.log(element.project);
                 }
             }
         }) 
@@ -163,8 +158,6 @@ content.addEventListener('click', (event) => {
         localStorage.setItem('myTask', JSON.stringify(myTask));
     } else if (task) {
         isChange = true;
-        console.log('isCh', isChange);
-        // let elemId;
         let elemObj = {};
         myTask.some((element, index) => {
             for(let id in element) {
@@ -180,7 +173,6 @@ content.addEventListener('click', (event) => {
 
         for(let key in elemObj) {
             if(key !== 'id') {
-                console.log(key, elemObj[key]);
                 valueFormBefore.set(key, elemObj[key]);
             }
         }
@@ -191,24 +183,13 @@ content.addEventListener('click', (event) => {
         }
 
         dialog.showModal()
-        console.log(task.id);
-        console.log(elemObj);
-        
     }
 })
 
-
 function changeTask(arr, taskId, newObj) {
-    const taskIndex = arr.filter(task => task.id === taskId);
-    // console.log({...myTask[taskId], ...newObj});
     let changeObj = {...myTask[taskId], ...newObj}
-    // arr[taskIndex] = {...myTask[taskIndex], ...newObj}
-    arr.splice(taskId, 1, changeObj)
-    // console.log(myTask);
-    addTaskDom(arr);
-    // localStorage.setItem(arr, JSON.stringify(arr));
+    arr.splice(taskId, 1, changeObj);
 }
-
 
 window.addEventListener('load', () => {
     myTask = JSON.parse(localStorage.getItem('myTask'));
