@@ -52,6 +52,8 @@ form.addEventListener('submit', (e) => {
     console.log(values);
     if(isChange) {
         changeTask(myTask, elemId, values);
+        addProjectFn(myTask);
+
         console.log('Work');
         // localStorage.setItem('myTask', JSON.stringify(myTask))
     } else{
@@ -61,9 +63,9 @@ form.addEventListener('submit', (e) => {
             if(isHome) {
                 addTaskDom(myTask);
             }
-            localStorage.setItem('myTask', JSON.stringify(myTask))
-        // }
-    }
+            // }
+        }
+        localStorage.setItem('myTask', JSON.stringify(myTask))
 
     dialog.close();
 })
@@ -137,7 +139,7 @@ content.addEventListener('click', (event) => {
     const task = target.closest('.task')
     const deleteBtn = target.closest('.button_task');
 
-    let elemId;
+    // let elemId;
     if(deleteBtn) {
         myTask.some((element, index) => {
             for(let id in element) {
@@ -149,8 +151,6 @@ content.addEventListener('click', (event) => {
                 }
             }
         }) 
-
-        // const argProject = myTask.filter(task => task.project === isProject);
 
         deleteTask(myTask, elemId)
         addProjectFn(myTask);
@@ -200,10 +200,11 @@ content.addEventListener('click', (event) => {
 
 function changeTask(arr, taskId, newObj) {
     const taskIndex = arr.filter(task => task.id === taskId);
-
+    // console.log({...myTask[taskId], ...newObj});
+    let changeObj = {...myTask[taskId], ...newObj}
     // arr[taskIndex] = {...myTask[taskIndex], ...newObj}
-    arr.splice(taskId, 1, newObj)
-    console.log(myTask);
+    arr.splice(taskId, 1, changeObj)
+    // console.log(myTask);
     addTaskDom(arr);
     // localStorage.setItem(arr, JSON.stringify(arr));
 }
